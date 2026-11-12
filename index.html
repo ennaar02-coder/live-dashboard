@@ -27,7 +27,7 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            font-size: 13px; /* Compact font */
+            font-size: 13px;
             display: flex;
             flex-direction: column;
             height: 100vh;
@@ -95,6 +95,10 @@
 
         .btn:hover {
             opacity: 0.9;
+        }
+
+        .btn-blue {
+            background: var(--accent-blue);
         }
 
         /* Main Container Layout */
@@ -208,6 +212,17 @@
             gap: 4px;
         }
 
+        .score-ticker {
+            background: rgba(34, 197, 94, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            padding: 5px 10px;
+            font-size: 11px;
+            color: var(--accent-green);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
         .odds-table {
             display: flex;
             flex-direction: column;
@@ -249,7 +264,7 @@
         .back-btn { background-color: #93c5fd; color: #1e3a8a; }
         .lay-btn { background-color: #fca5a5; color: #7f1d1d; }
 
-        /* Bets & Panel Tables */
+        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -300,8 +315,8 @@
                 <div class="menu-item active" onclick="switchTab('exchange')">📊 Live Exchange</div>
                 <div class="menu-item" onclick="switchTab('upcoming')">📅 Upcoming Matches</div>
                 <div class="menu-item" onclick="switchTab('bets')">📜 My Bets History</div>
+                <div class="menu-item" onclick="switchTab('change-password')" id="menu-client-pwd">🔑 Change Password</div>
                 <div class="menu-item" onclick="switchTab('admin-clients')" id="menu-admin-clients" style="display:none;">👥 Manage Client IDs</div>
-                <div class="menu-item" onclick="window.open('https://www.cricbuzz.com', '_blank')">🏏 Cricbuzz Live Score</div>
             </div>
             <div class="sidebar-clock">
                 <div id="live-date">12 Nov 2026</div>
@@ -322,7 +337,11 @@
                 <div class="match-card">
                     <div class="match-header">
                         <span>India vs Australia • ODI Series</span>
-                        <span class="live-tag">● LIVE (16.2 ov)</span>
+                        <span class="live-tag">● LIVE</span>
+                    </div>
+                    <div class="score-ticker">
+                        <span>Score: IND 142/3 (16.2 ov)</span>
+                        <span>CRR: 8.70</span>
                     </div>
                     <div class="odds-table">
                         <div class="odds-row">
@@ -346,7 +365,11 @@
                 <div class="match-card">
                     <div class="match-header">
                         <span>England vs Pakistan • ODI Series</span>
-                        <span class="live-tag">● LIVE (45.0 ov)</span>
+                        <span class="live-tag">● LIVE</span>
+                    </div>
+                    <div class="score-ticker">
+                        <span>Score: ENG 285/6 (45.0 ov)</span>
+                        <span>CRR: 6.33</span>
                     </div>
                     <div class="odds-table">
                         <div class="odds-row">
@@ -377,7 +400,7 @@
                             <tr>
                                 <td>13 Nov, 11:30 AM</td>
                                 <td>Afghanistan vs Zimbabwe</td>
-                                <span>Test Series</span>
+                                <td>Test Series</td>
                                 <td>Harare</td>
                             </tr>
                             <tr>
@@ -391,7 +414,26 @@
                 </div>
             </div>
 
-            <!-- TAB 3: ADMIN PANEL (ROW-WISE CLIENT TABLE) -->
+            <!-- TAB 3: CLIENT PASSWORD CHANGE -->
+            <div id="tab-change-password" class="market-section hidden">
+                <div class="card" style="max-width: 400px;">
+                    <h3 style="margin-bottom: 12px; font-size: 13px;">Change Your Password</h3>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 11px; color: var(--text-muted);">Current Password</label>
+                        <input type="password" id="old-pwd" style="background: var(--bg-dark); color: white; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px;">
+                        
+                        <label style="font-size: 11px; color: var(--text-muted);">New Password</label>
+                        <input type="password" id="new-pwd" style="background: var(--bg-dark); color: white; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px;">
+                        
+                        <label style="font-size: 11px; color: var(--text-muted);">Confirm New Password</label>
+                        <input type="password" id="confirm-pwd" style="background: var(--bg-dark); color: white; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px;">
+                        
+                        <button class="btn btn-blue" onclick="updateClientPassword()" style="margin-top: 6px; padding: 6px;">Update Password</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: ADMIN PANEL -->
             <div id="tab-admin-clients" class="market-section hidden">
                 <div class="card">
                     <h3 style="margin-bottom: 8px; font-size: 13px;">Admin Control: Client Management &amp; P&amp;L Table</h3>
@@ -403,32 +445,38 @@
                                 <th>Balance (₹)</th>
                                 <th>Active Bets</th>
                                 <th>Running P&amp;L</th>
-                                <th>Action</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="admin-client-table-body">
-                            <tr>
+                            <tr id="row-rahul">
                                 <td><strong>rahul</strong></td>
                                 <td><span class="profit">Active</span></td>
-                                <td>₹50,000</td>
+                                <td class="client-bal">₹50,000</td>
                                 <td>1</td>
                                 <td class="profit">+₹3,600</td>
-                                <td><button class="btn" style="padding: 2px 6px; font-size: 10px;">Edit Limit</button></td>
+                                <td>
+                                    <button class="btn" style="padding: 2px 6px; font-size: 10px;" onclick="editClientLimit('row-rahul')">Edit Limit</button>
+                                    <button class="btn btn-blue" style="padding: 2px 6px; font-size: 10px;" onclick="adminChangePassword('rahul')">Change Pwd</button>
+                                </td>
                             </tr>
-                            <tr>
+                            <tr id="row-amit">
                                 <td><strong>amit_99</strong></td>
                                 <td><span class="profit">Active</span></td>
-                                <td>₹25,000</td>
+                                <td class="client-bal">₹25,000</td>
                                 <td>0</td>
                                 <td>₹0.00</td>
-                                <td><button class="btn" style="padding: 2px 6px; font-size: 10px;">Edit Limit</button></td>
+                                <td>
+                                    <button class="btn" style="padding: 2px 6px; font-size: 10px;" onclick="editClientLimit('row-amit')">Edit Limit</button>
+                                    <button class="btn btn-blue" style="padding: 2px 6px; font-size: 10px;" onclick="adminChangePassword('amit_99')">Change Pwd</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Right Panel: Slip & Account Summary -->
+            <!-- Right Panel -->
             <div class="right-panel">
                 <div class="card">
                     <h4 style="margin-bottom: 6px; font-size: 12px;">Bet Slip</h4>
@@ -473,30 +521,35 @@
 
             if(tabName === 'exchange') {
                 document.getElementById('tab-exchange').classList.remove('hidden');
-                event.target.classList.add('active');
             } else if(tabName === 'upcoming') {
                 document.getElementById('tab-upcoming').classList.remove('hidden');
-                event.target.classList.add('active');
-            } else if(tabName === 'bets' || tabName === 'admin-clients') {
-                if(document.getElementById('user-switcher').value === 'admin') {
-                    document.getElementById('tab-admin-clients').classList.remove('hidden');
-                } else {
-                    document.getElementById('tab-exchange').classList.remove('hidden');
-                }
+            } else if(tabName === 'change-password') {
+                document.getElementById('tab-change-password').classList.remove('hidden');
+            } else if(tabName === 'bets') {
+                document.getElementById('tab-exchange').classList.remove('hidden');
+            } else if(tabName === 'admin-clients') {
+                document.getElementById('tab-admin-clients').classList.remove('hidden');
+            }
+            
+            // Highlight clicked menu item safely
+            if(event && event.target && event.target.classList.contains('menu-item')) {
                 event.target.classList.add('active');
             }
         }
 
         function switchUserRole(role) {
             const adminMenu = document.getElementById('menu-admin-clients');
+            const clientPwdMenu = document.getElementById('menu-client-pwd');
             const roleLbl = document.getElementById('current-role-lbl');
             
             if(role === 'admin') {
                 adminMenu.style.display = 'block';
+                clientPwdMenu.style.display = 'none';
                 roleLbl.innerText = 'Admin';
                 switchTab('admin-clients');
             } else {
                 adminMenu.style.display = 'none';
+                clientPwdMenu.style.display = 'block';
                 roleLbl.innerText = 'Client';
                 switchTab('exchange');
             }
@@ -518,14 +571,51 @@
             }
             const stake = document.getElementById('stake-input').value;
             alert(`Bet Placed Successfully!\nTeam: ${selectedBet.team} (${selectedBet.side})\nOdds: ${selectedBet.odds}\nStake: ₹${stake}`);
-            
-            // Update mock P&L
             document.getElementById('live-pnl').innerText = '+₹' + (stake * 0.72).toFixed(2);
         }
 
+        function editClientLimit(rowId) {
+            const row = document.getElementById(rowId);
+            const balCell = row.querySelector('.client-bal');
+            const newAmt = prompt("Enter new balance limit (₹):", balCell.innerText.replace('₹', '').replace(',', ''));
+            if(newAmt !== null && newAmt.trim() !== "") {
+                balCell.innerText = '₹' + Number(newAmt).toLocaleString('en-IN');
+                alert('Client balance limit updated successfully!');
+            }
+        }
+
+        function adminChangePassword(clientId) {
+            const newPwd = prompt(`Enter new password for client [${clientId}]:`);
+            if(newPwd !== null && newPwd.trim() !== "") {
+                alert(`Password for client '${clientId}' has been updated successfully!`);
+            }
+        }
+
+        function updateClientPassword() {
+            const oldP = document.getElementById('old-pwd').value;
+            const newP = document.getElementById('new-pwd').value;
+            const confP = document.getElementById('confirm-pwd').value;
+
+            if(!oldP || !newP || !confP) {
+                alert('Please fill all password fields!');
+                return;
+            }
+            if(newP !== confP) {
+                alert('New password and confirm password do not match!');
+                return;
+            }
+            alert('Your password has been changed successfully!');
+            document.getElementById('old-pwd').value = '';
+            document.getElementById('new-pwd').value = '';
+            document.getElementById('confirm-pwd').value = '';
+            switchTab('exchange');
+        }
+
         function logout() {
-            alert('Logged out successfully.');
-            location.reload();
+            if(confirm('Are you sure you want to logout?')) {
+                // Real logout redirect/reload to login state
+                window.location.href = window.location.href.split('?')[0];
+            }
         }
     </script>
 </body>
