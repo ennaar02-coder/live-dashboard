@@ -34,7 +34,6 @@
             overflow: hidden;
         }
 
-        /* Login Screen */
         #login-screen {
             position: fixed;
             inset: 0;
@@ -89,7 +88,6 @@
             font-size: 12px;
         }
 
-        /* Dashboard App Wrapper */
         #app-wrapper {
             display: flex;
             flex-direction: column;
@@ -97,7 +95,6 @@
             width: 100%;
         }
 
-        /* Top Header */
         header {
             background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
@@ -157,14 +154,12 @@
         .btn:hover { opacity: 0.9; }
         .btn-blue { background: var(--accent-blue); }
 
-        /* Main Container Layout */
         .main-container {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
 
-        /* Sidebar */
         sidebar {
             width: 210px;
             background-color: var(--bg-sidebar);
@@ -210,7 +205,6 @@
             color: var(--text-main);
         }
 
-        /* Content Area */
         .content-area {
             flex: 1;
             padding: 12px;
@@ -241,7 +235,6 @@
             padding: 10px;
         }
 
-        /* Match Box */
         .match-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -307,7 +300,6 @@
         .back-btn { background-color: #93c5fd; color: #1e3a8a; }
         .lay-btn { background-color: #fca5a5; color: #7f1d1d; }
 
-        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -333,7 +325,6 @@
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-box">
             <h2><span style="color: var(--accent-red);">⚡</span> MATCH DESK</h2>
@@ -355,9 +346,7 @@
         </div>
     </div>
 
-    <!-- MAIN APP WRAPPER -->
     <div id="app-wrapper" class="hidden">
-        <!-- Header -->
         <header>
             <div class="logo-area">
                 <span>⚡</span> MATCH DESK <span class="badge-exchange">Exchange</span>
@@ -368,10 +357,7 @@
             </div>
         </header>
 
-        <!-- Main Body -->
         <div class="main-container">
-            
-            <!-- Sidebar -->
             <sidebar>
                 <div class="sidebar-menu">
                     <div class="menu-item active" onclick="switchTab('exchange', this)">📊 Live Exchange</div>
@@ -386,16 +372,12 @@
                 </div>
             </sidebar>
 
-            <!-- Content Area -->
             <div class="content-area">
-
-                <!-- TAB 1: LIVE EXCHANGE -->
                 <div id="tab-exchange" class="market-section">
                     <div class="card" style="padding: 6px 10px; background: rgba(59, 130, 246, 0.1); border-color: var(--accent-blue);">
                         <span>📢 Live P&amp;L Status: <strong id="live-pnl" class="profit">₹0.00</strong></span>
                     </div>
 
-                    <!-- Match 1 -->
                     <div class="match-card">
                         <div class="match-header">
                             <span>India vs Australia • ODI Series</span>
@@ -423,7 +405,6 @@
                         </div>
                     </div>
 
-                    <!-- Match 2 -->
                     <div class="match-card">
                         <div class="match-header">
                             <span>England vs Pakistan • ODI Series</span>
@@ -445,7 +426,6 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: UPCOMING MATCHES -->
                 <div id="tab-upcoming" class="market-section hidden">
                     <div class="card">
                         <h3 style="margin-bottom: 8px; font-size: 13px;">Upcoming Fixtures</h3>
@@ -476,7 +456,6 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: CHANGE OWN PASSWORD (BOTH ADMIN & CLIENT) -->
                 <div id="tab-change-password" class="market-section hidden">
                     <div class="card" style="max-width: 400px;">
                         <h3 style="margin-bottom: 12px; font-size: 13px;">Change Your Account Password</h3>
@@ -495,7 +474,6 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: ADMIN PANEL -->
                 <div id="tab-admin-clients" class="market-section hidden">
                     <div class="card">
                         <h3 style="margin-bottom: 8px; font-size: 13px;">Admin Control: Client Management &amp; P&amp;L Table</h3>
@@ -510,14 +488,11 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="admin-client-table-body">
-                                <!-- Populated via JS -->
-                            </tbody>
+                            <tbody id="admin-client-table-body"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Right Panel -->
                 <div class="right-panel" id="right-panel-box">
                     <div class="card">
                         <h4 style="margin-bottom: 6px; font-size: 12px;">Bet Slip</h4>
@@ -549,7 +524,6 @@
     </div>
 
     <script>
-        // Initialize Default Users in localStorage if not present
         const defaultUsers = {
             admin: { id: 'admin', password: '123', role: 'Admin', balance: 0, bets: 0, pnl: 0 },
             rahul: { id: 'rahul', password: '123', role: 'Client', balance: 50000, bets: 1, pnl: 3600 },
@@ -557,25 +531,23 @@
         };
 
         function getUsers() {
-            const stored = localStorage.getItem('matchdesk_users');
+            const stored = localStorage.getItem('matchdesk_users_v3');
             if (!stored) {
-                localStorage.setItem('matchdesk_users', JSON.stringify(defaultUsers));
+                localStorage.setItem('matchdesk_users_v3', JSON.stringify(defaultUsers));
                 return defaultUsers;
             }
             return JSON.parse(stored);
         }
 
         function saveUsers(users) {
-            localStorage.setItem('matchdesk_users', JSON.stringify(users));
+            localStorage.setItem('matchdesk_users_v3', JSON.stringify(users));
         }
 
-        // Live Clock Widget
         setInterval(() => {
             const now = new Date();
             document.getElementById('live-time').innerText = now.toTimeString().split(' ')[0];
         }, 1000);
 
-        // Check active session on page load
         window.onload = function() {
             const activeUserId = sessionStorage.getItem('matchdesk_active_user');
             if (activeUserId) {
