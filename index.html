@@ -531,16 +531,16 @@
         };
 
         function getUsers() {
-            const stored = localStorage.getItem('matchdesk_users_v3');
+            const stored = localStorage.getItem('matchdesk_users_v4');
             if (!stored) {
-                localStorage.setItem('matchdesk_users_v3', JSON.stringify(defaultUsers));
+                localStorage.setItem('matchdesk_users_v4', JSON.stringify(defaultUsers));
                 return defaultUsers;
             }
             return JSON.parse(stored);
         }
 
         function saveUsers(users) {
-            localStorage.setItem('matchdesk_users_v3', JSON.stringify(users));
+            localStorage.setItem('matchdesk_users_v4', JSON.stringify(users));
         }
 
         setInterval(() => {
@@ -549,6 +549,7 @@
         }, 1000);
 
         window.onload = function() {
+            // Force clean initial load state if needed
             const activeUserId = sessionStorage.getItem('matchdesk_active_user');
             if (activeUserId) {
                 loadDashboard(activeUserId);
@@ -566,7 +567,7 @@
                 document.getElementById('login-pwd').value = '';
                 loadDashboard(idInput);
             } else {
-                alert('Invalid User ID or Password!');
+                alert('Invalid User ID or Password! Use admin / 123 or rahul / 123');
             }
         }
 
